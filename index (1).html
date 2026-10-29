@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Медиа-центр: план недели</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f3;--sf:#fff;--tx:#14181f;--mu:#6a7280;--bd:#dbdee4;--hd:#14181f;--hdtx:#fff;
+--shoot:#2563eb;--edit:#7c3aed;--live:#e11d48;--event:#059669;--other:#6b7280;--ac:#ffd400}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1116;--sf:#181c24;--tx:#eef0f4;--mu:#98a0ae;--bd:#2a303b;--hd:#05070a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 Onest,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}
+header{background:var(--hd);color:var(--hdtx);padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.01em;margin-right:auto;display:flex;align-items:center;gap:10px}
+h1:before{content:"";width:12px;height:12px;border-radius:50%;background:var(--live);box-shadow:0 0 0 4px rgba(225,29,72,.3)}
+button,select,input,textarea{font:inherit;color:inherit}
+.b{border:1px solid var(--bd);background:var(--sf);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:500}
+header .b{background:transparent;border-color:#3a4150;color:var(--hdtx)}
+.b:hover{border-color:var(--ac)}
+.b.p{background:var(--ac);color:#14181f;border-color:var(--ac);font-weight:700}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 20px}
+.bar .t{font-weight:700;font-size:18px;min-width:210px;text-align:center}
+.bar select{padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--sf)}
+main{padding:0 20px 28px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.day{background:var(--sf);border:1px solid var(--bd);border-radius:10px;min-height:200px;display:flex;flex-direction:column}
+.day.today{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}
+.dh{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:baseline}
+.dh b{font-weight:800}.dh span{color:var(--mu);font-size:13px}
+.list{padding:8px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card{border-left:5px solid var(--c);background:var(--bg);border-radius:6px;padding:8px 10px;cursor:pointer;text-align:left;border-top:0;border-right:0;border-bottom:0;width:100%}
+.card:hover{filter:brightness(.97)}
+.card .tm{font-size:12px;color:var(--mu);font-weight:500}
+.card .tt{font-weight:700;margin:1px 0}
+.card .mt{font-size:12.5px;color:var(--mu)}
+.card.done{opacity:.55}.card.done .tt{text-decoration:line-through}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--c);color:#fff;margin-right:4px}
+.warn{color:#d97706;font-weight:700}
+.add{margin:0 8px 8px;border:1px dashed var(--bd);background:none;border-radius:6px;padding:6px;color:var(--mu);cursor:pointer}
+.add:hover{border-color:var(--ac);color:var(--tx)}
+h2{font-size:17px;margin:26px 0 10px;font-weight:800}
+.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.empty{color:var(--mu);padding:10px 4px;font-size:14px}
+dialog{border:1px solid var(--bd);border-radius:14px;background:var(--sf);color:var(--tx);padding:20px;width:min(480px,94vw)}
+dialog::backdrop{background:rgba(5,7,10,.6)}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 3px}
+dialog input,dialog select,dialog textarea{width:100%;padding:9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.act{display:flex;gap:8px;margin-top:18px}
+.act .sp{flex:1}
+.del{color:var(--live)}
+@media(max-width:1000px){.week{grid-template-columns:1fr}.day{min-height:0}.bar .t{min-width:0;flex:1}}
+@media(prefers-reduced-motion:no-preference){.card{transition:filter .15s}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Медиа-центр · план недели</h1>
+  <button class="b" id="exp">Скачать копию</button>
+  <button class="b" id="imp">Загрузить копию</button>
+  <input type="file" id="file" accept=".json" hidden>
+  <button class="b p" id="new">+ Новое дело</button>
+</header>
+<div class="bar">
+  <button class="b" id="prev" aria-label="Прошлая неделя">←</button>
+  <div class="t" id="title"></div>
+  <button class="b" id="next" aria-label="Следующая неделя">→</button>
+  <button class="b" id="now">Эта неделя</button>
+  <select id="who" aria-label="Фильтр по человеку"></select>
+</div>
+<main>
+  <div class="week" id="week"></div>
+  <h2>Что снять: идеи без даты</h2>
+  <div class="ideas" id="ideas"></div>
+</main>
+
+<dialog id="dlg">
+  <div id="dt" style="font-weight:800;font-size:18px"></div>
+  <label>Название</label><input id="f_title" placeholder="Например: Съёмка открытия выставки">
+  <div class="row">
+    <div><label>Дата (пусто = идея)</label><input id="f_date" type="date"></div>
+    <div><label>Время</label><input id="f_time" type="time"></div>
+  </div>
+  <div class="row">
+    <div><label>Тип</label><select id="f_type"></select></div>
+    <div><label>Статус</label><select id="f_status"></select></div>
+  </div>
+  <div class="row">
+    <div><label>Кто отвечает</label><input id="f_who" placeholder="Имя"></div>
+    <div><label>Место</label><input id="f_place"></div>
+  </div>
+  <label>Техника</label><input id="f_gear" placeholder="Камера 1, свет, петлички">
+  <label>Заметки и ссылки</label><textarea id="f_notes" rows="3"></textarea>
+  <div class="act">
+    <button class="b del" id="del">Удалить</button><span class="sp"></span>
+    <button class="b" id="cancel">Отмена</button>
+    <button class="b p" id="save">Сохранить</button>
+  </div>
+</dialog>
+
+<script>
+const TYPES={shoot:["Съёмка","--shoot"],edit:["Монтаж","--edit"],live:["Эфир","--live"],event:["Мероприятие","--event"],other:["Другое","--other"]};
+const STAT={plan:"В планах",work:"В работе",done:"Готово"};
+const DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+const KEY="mediaplan.v1";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const monday=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const MON=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+
+let items=[],start=monday(new Date()),who="",editId=null;
+try{items=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){items=[]}
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}};
+
+$("f_type").innerHTML=Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("");
+$("f_status").innerHTML=Object.entries(STAT).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+
+function conflicts(){
+  const m={},c=new Set();
+  items.forEach(i=>{
+    if(!i.date||!i.time||i.status==="done")return;
+    [i.who&&"w|"+i.who,...(i.gear||"").split(",").map(g=>g.trim().toLowerCase()).filter(Boolean).map(g=>"g|"+g)].filter(Boolean).forEach(k=>{
+      const key=i.date+"|"+i.time+"|"+k.toLowerCase();
+      (m[key]=m[key]||[]).push(i.id);
+    });
+  });
+  Object.values(m).forEach(a=>{if(a.length>1)a.forEach(x=>c.add(x))});
+  return c;
+}
+
+function cardHTML(i,bad){
+  const [tn,tc]=TYPES[i.type]||TYPES.other;
+  return `<button class="card ${i.status==="done"?"done":""}" style="--c:var(${tc})" data-id="${i.id}">
+    <div class="tm">${esc(i.time)||"весь день"}${bad.has(i.id)?' <span class="warn" title="Тот же человек или техника заняты в это время">⚠ конфликт</span>':""}</div>
+    <div class="tt">${esc(i.title)||"Без названия"}</div>
+    <div class="mt"><span class="tag" style="--c:var(${tc})">${tn}</span>${i.status!=="plan"?STAT[i.status]:""}</div>
+    <div class="mt">${[i.who,i.place].filter(Boolean).map(esc).join(" · ")}</div>
+    ${i.gear?`<div class="mt">🎥 ${esc(i.gear)}</div>`:""}
+  </button>`;
+}
+
+function render(){
+  const end=addDays(start,6),bad=conflicts(),today=iso(new Date());
+  $("title").textContent=`${start.getDate()} ${start.getMonth()===end.getMonth()?"":MON[start.getMonth()]+" "}– ${end.getDate()} ${MON[end.getMonth()]}`;
+  const people=[...new Set(items.map(i=>i.who).filter(Boolean))].sort();
+  $("who").innerHTML=`<option value="">Все</option>`+people.map(p=>`<option ${p===who?"selected":""}>${esc(p)}</option>`).join("");
+  const vis=i=>!who||i.who===who;
+  let h="";
+  for(let n=0;n<7;n++){
+    const d=addDays(start,n),k=iso(d);
+    const list=items.filter(i=>i.date===k&&vis(i)).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+    h+=`<section class="day ${k===today?"today":""}"><div class="dh"><b>${DAYS[n]}</b><span>${d.getDate()} ${MON[d.getMonth()]}</span></div>
+      <div class="list">${list.map(i=>cardHTML(i,bad)).join("")}</div>
+      <button class="add" data-date="${k}">+ добавить</button></section>`;
+  }
+  $("week").innerHTML=h;
+  const ideas=items.filter(i=>!i.date&&vis(i));
+  $("ideas").innerHTML=ideas.length?ideas.map(i=>cardHTML(i,bad)).join(""):`<div class="empty">Пока пусто. Добавьте дело без даты, и оно попадёт сюда.</div>`;
+}
+
+function openForm(id,date){
+  editId=id;
+  const i=items.find(x=>x.id===id)||{date:date||"",type:"shoot",status:"plan"};
+  $("dt").textContent=id?"Изменить дело":"Новое дело";
+  $("f_title").value=i.title||"";$("f_date").value=i.date||"";$("f_time").value=i.time||"";
+  $("f_type").value=i.type;$("f_status").value=i.status;$("f_who").value=i.who||"";
+  $("f_place").value=i.place||"";$("f_gear").value=i.gear||"";$("f_notes").value=i.notes||"";
+  $("del").style.display=id?"":"none";
+  $("dlg").showModal();$("f_title").focus();
+}
+
+$("save").onclick=()=>{
+  const o={title:$("f_title").value.trim(),date:$("f_date").value,time:$("f_time").value,type:$("f_type").value,
+    status:$("f_status").value,who:$("f_who").value.trim(),place:$("f_place").value.trim(),gear:$("f_gear").value.trim(),notes:$("f_notes").value.trim()};
+  if(!o.title){$("f_title").focus();return}
+  if(editId)Object.assign(items.find(x=>x.id===editId),o);else items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),...o});
+  if(o.date)start=monday(new Date(o.date+"T00:00"));
+  persist();$("dlg").close();render();
+};
+$("cancel").onclick=()=>$("dlg").close();
+$("del").onclick=()=>{if(confirm("Удалить это дело?")){items=items.filter(x=>x.id!==editId);persist();$("dlg").close();render()}};
+$("new").onclick=()=>openForm(null,iso(new Date()));
+$("prev").onclick=()=>{start=addDays(start,-7);render()};
+$("next").onclick=()=>{start=addDays(start,7);render()};
+$("now").onclick=()=>{start=monday(new Date());render()};
+$("who").onchange=e=>{who=e.target.value;render()};
+document.addEventListener("click",e=>{
+  const c=e.target.closest(".card"),a=e.target.closest(".add");
+  if(c)openForm(c.dataset.id);else if(a)openForm(null,a.dataset.date);
+});
+$("exp").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(items,null,2)],{type:"application/json"}));
+  a.download="mediaplan-"+iso(new Date())+".json";a.click();
+};
+$("imp").onclick=()=>$("file").click();
+$("file").onchange=async e=>{
+  try{
+    const data=JSON.parse(await e.target.files[0].text());
+    if(!Array.isArray(data))throw 0;
+    if(confirm("Заменить текущие дела данными из файла?")){items=data;persist();render()}
+  }catch(err){alert("Не удалось прочитать файл. Нужна копия, скачанная из этой страницы.")}
+  e.target.value="";
+};
+render();
+</script>
+</body>
+</html>
